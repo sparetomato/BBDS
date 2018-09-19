@@ -23,7 +23,7 @@ namespace Blue_Badge_Digital_Service
         public void GetNewApplications()
         {
             var baseUri = new Uri(ConfigurationManager.AppSettings["BBDSURI"]);
-            string startOfTheMonth = "2018-09-19T00:00Z";
+            string startOfTheMonth = ConfigurationManager.AppSettings["DateFrom"];
             var requestApplicationsData = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
@@ -33,8 +33,8 @@ namespace Blue_Badge_Digital_Service
             HttpResponseMessage results = client.SendAsync(requestApplicationsData).Result;
             JObject resultData = JObject.Parse(results.Content.ReadAsStringAsync().Result);// resultData is the JSON object, use Nortonsoft to parse this into individual calls
             Console.WriteLine(resultData["data"].Count() + " Applications received");
-            //for(int i = 0;i<resultData["data"].Count(); i++)
-            for(int i=0;i<1;i++)
+            for(int i = 0;i<resultData["data"].Count(); i++)
+            //for(int i=0;i<resultData[";i++)
             {
                 Console.WriteLine("Getting Application Data for ID:" + resultData["data"][i]["applicationId"] + " : " + resultData["data"][i]["name"]);
                 var requestFullApplicationData = new HttpRequestMessage
@@ -54,8 +54,6 @@ namespace Blue_Badge_Digital_Service
 
         private void CreateFirmstepCaseFromApplication(BBDSApplication application)
         {
-            //String sampleJSON =
-              //  "{\"process_id\": \"AF-Process-b035fb86-7458-4554-a9d7-5681fa2c3c81\",\"data\" :{\"test\":\"test\"},\"submissionType\" : \"new\",\"published\" : \"true\",\"ucrn\": \"768255944\"}";
 
             JObject startThreadJSON = new JObject();
             startThreadJSON.Add("process_id", "AF-Process-b035fb86-7458-4554-a9d7-5681fa2c3c81");
@@ -79,7 +77,7 @@ namespace Blue_Badge_Digital_Service
             applicationData.Add("descriptionOfConditions", value: application.eligibility.descriptionOfConditions);
             applicationData.Add("walkingLengthOfTimeCode", value: application.eligibility.walkingDifficulty.walkingLengthOfTimeCode);
             applicationData.Add("walkingSpeedCode", value: application.eligibility.walkingDifficulty.walkingSpeedCode);
-            applicationData.Add("oAuthKey", value: bearerToken);
+            applicationData.Add("oAuthKey", value: "Bearer " + bearerToken);
 
             
             
@@ -104,18 +102,6 @@ namespace Blue_Badge_Digital_Service
             
             HttpResponseMessage applicationResult = firmstepClient.SendAsync(startThreadAPIMessage).Result;
             Console.WriteLine(applicationResult);
-            //using (CookieAwareWebClient client = new CookieAwareWebClient())
-            //{
-            //    NameValueCollection values = new NameValueCollection();
-            //    byte[] response =
-            //        client.UploadValues(
-            //            ConfigurationManager.AppSettings["FS-StartthreadAPIUrl"] + "?apiKey=" +
-            //            ConfigurationManager.AppSettings["FS-StartthreadAPIKey"], values);
-            //    Console.WriteLine(Encoding.Default.GetString(response));
-            //}
-
-
-            
         }
 
         private static string Base64Encode(string plainText)
@@ -149,7 +135,7 @@ namespace Blue_Badge_Digital_Service
 
             
 
-            Console.WriteLine(bearerToken);
+            Console.WriteLine("Obtained Access token from BBDS");
 
         }
 
