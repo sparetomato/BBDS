@@ -47,7 +47,7 @@ namespace Blue_Badge_Digital_Service
             party.contact = new Contact
             {
                 fullName = (string)jsonJObject["party"]["contact"]["fullName"],
-                buildingStreet = (string)jsonJObject["party"]["contact"]["fullName"],
+                buildingStreet = (string)jsonJObject["party"]["contact"]["buildingStreet"],
                 line2 = (string)jsonJObject["party"]["contact"]["line2"],
                 townCity = (string)jsonJObject["party"]["contact"]["townCity"],
                 postCode = (string)jsonJObject["party"]["contact"]["postCode"],
@@ -56,7 +56,9 @@ namespace Blue_Badge_Digital_Service
                 emailAddress = (string)jsonJObject["party"]["contact"]["emailAddress"],
             };
             eligibility = new Eligibility();
-            switch ((string)jsonJObject["eligibility"]["typeCode"])
+            eligibility.typeCode = (string)jsonJObject["eligibility"]["typeCode"];
+            eligibility.descriptionOfConditions = (string)jsonJObject["eligibility"]["descriptionOfConditions"];
+            switch (eligibility.typeCode)
             {
                 case "PIP":
                 case "DLA":

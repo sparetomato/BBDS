@@ -23,7 +23,7 @@ namespace Blue_Badge_Digital_Service
         public void GetNewApplications()
         {
             var baseUri = new Uri(ConfigurationManager.AppSettings["BBDSURI"]);
-            string startOfTheMonth = "2018-09-01T00:00Z";
+            string startOfTheMonth = "2018-09-19T00:00Z";
             var requestApplicationsData = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
@@ -48,27 +48,40 @@ namespace Blue_Badge_Digital_Service
                 JObject applicationResultData = JObject.Parse(applicationResult.Content.ReadAsStringAsync().Result);
                 Console.WriteLine(applicationResult.Content.ReadAsStringAsync().Result);
                 BBDSApplication application = new BBDSApplication((JObject)applicationResultData["data"]);
-                //CreateFirmstepCaseFromApplication(application);
+                CreateFirmstepCaseFromApplication(application);
             }
         }
 
         private void CreateFirmstepCaseFromApplication(BBDSApplication application)
         {
-            String sampleJSON =
-                "{\"process_id\": \"AF-Process-b035fb86-7458-4554-a9d7-5681fa2c3c81\",\"data\" :{\"test\":\"test\"},\"submissionType\" : \"new\",\"published\" : \"true\",\"ucrn\": \"768255944\"}";
+            //String sampleJSON =
+              //  "{\"process_id\": \"AF-Process-b035fb86-7458-4554-a9d7-5681fa2c3c81\",\"data\" :{\"test\":\"test\"},\"submissionType\" : \"new\",\"published\" : \"true\",\"ucrn\": \"768255944\"}";
 
             JObject startThreadJSON = new JObject();
             startThreadJSON.Add("process_id", "AF-Process-b035fb86-7458-4554-a9d7-5681fa2c3c81");
             
+            //TODO: See if there is a better way of handling this mapping? possibly handle in a config file?
             JObject applicationData = new JObject();
             applicationData.Add("first_name", application.party.person.badgeHolderName);
-            applicationData.Add("Date_of_Birth", application.party.person.dob);
+            applicationData.Add("dob", application.party.person.dob);
             applicationData.Add("FullName",application.party.person.badgeHolderName);
+            applicationData.Add("gender_id", value: application.party.person.genderCode);
             applicationData.Add("nino",application.party.person.nino);
-            applicationData.Add("house", application.party.contact.buildingStreet);
+            applicationData.Add("BuildingAndStreet", value: application.party.contact.buildingStreet);
             applicationData.Add("AddressLine2", application.party.contact.line2);
-            applicationData.Add("town", application.party.contact.townCity);
-            applicationData.Add("postcode", application.party.contact.postCode);
+            applicationData.Add("TownOrCity", application.party.contact.townCity);
+            applicationData.Add("Postcode", application.party.contact.postCode);
+            applicationData.Add("primaryPhoneNumber", value: application.party.contact.primaryPhoneNumber);
+            applicationData.Add("secondaryPhoneNumber", value: application.party.contact.secondaryPhoneNumber);
+            applicationData.Add("emailAddress", value: application.party.contact.emailAddress);
+            applicationData.Add("calc_typeCode", value: "PERSON");
+            applicationData.Add("typeCode", value: application.eligibility.typeCode);
+            applicationData.Add("descriptionOfConditions", value: application.eligibility.descriptionOfConditions);
+            applicationData.Add("walkingLengthOfTimeCode", value: application.eligibility.walkingDifficulty.walkingLengthOfTimeCode);
+            applicationData.Add("walkingSpeedCode", value: application.eligibility.walkingDifficulty.walkingSpeedCode);
+            applicationData.Add("oAuthKey", value: bearerToken);
+
+            
             
             startThreadJSON.Add("data",applicationData);
             startThreadJSON.Add("submissionType", "new");
@@ -84,13 +97,13 @@ namespace Blue_Badge_Digital_Service
             startThreadAPIMessage.Headers.TryAddWithoutValidation("User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
             startThreadAPIMessage.Headers.TryAddWithoutValidation("Accept", "application/json");
-            //startThreadAPIMessage.Headers.TryAddWithoutValidation("Authorization", String.Format("Bearer {0}", bearerToken));
+           
             HttpClientHandler handler = new HttpClientHandler();
             handler.CookieContainer = new CookieContainer();
             HttpClient firmstepClient = new HttpClient(handler);
             
-           // HttpResponseMessage applicationResult = firmstepClient.SendAsync(startThreadAPIMessage).Result;
-            //Console.WriteLine(applicationResult);
+            HttpResponseMessage applicationResult = firmstepClient.SendAsync(startThreadAPIMessage).Result;
+            Console.WriteLine(applicationResult);
             //using (CookieAwareWebClient client = new CookieAwareWebClient())
             //{
             //    NameValueCollection values = new NameValueCollection();
