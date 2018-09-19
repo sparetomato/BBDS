@@ -49,9 +49,6 @@
   <ItemGroup>
     <Compile Include="BBDSApplication.cs" />
     <Compile Include="BBDSManager.cs" />
-    <Compile Include="CookieAwareWebContainer.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,7 +56,9 @@
     <Folder Include="JSON\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
